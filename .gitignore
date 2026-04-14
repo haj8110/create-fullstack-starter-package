@@ -1,0 +1,22 @@
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+
+# Local test scaffolds
+test-app/
+test-app-js/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Cursor git trailer workaround
+Cursor
+

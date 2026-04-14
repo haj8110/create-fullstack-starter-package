@@ -1,0 +1,128 @@
+import path from "node:path";
+import { Command } from "commander";
+import inquirer from "inquirer";
+import ora from "ora";
+import chalk from "chalk";
+import validatePackageName from "validate-npm-package-name";
+import fs from "fs-extra";
+import { fileURLToPath } from "node:url";
+
+import { copyTemplateDir } from "../fs/copyTemplateDir.js";
+import { ensureEmptyDirOrThrow, resolveProjectDir } from "../fs/projectDir.js";
+import { installDependencies } from "../pm/installDependencies.js";
+import { writeRootPackageJson } from "../project/writeRootPackageJson.js";
+import { writeBackendEnv } from "../project/writeBackendEnv.js";
+
+export type Language = "ts" | "js";
+export type Database = "mongodb" | "postgres";
+
+function resolveTemplatesDir(): string {
+  // In the published package we run the bundled file at `dist/index.js`.
+  // Resolve templates relative to that location: `dist/../templates`.
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(here, "../templates");
+}
+
+export type CreateOptions = {
+  ts?: boolean;
+  js?: boolean;
+  db?: string;
+  install?: boolean;
+  force?: boolean;
+};
+
+export async function createAction(dirArg: string | undefined, options: CreateOptions) {
+  const templatesDir = resolveTemplatesDir();
+
+  const initialDir = dirArg ?? ".";
+  const projectDir = resolveProjectDir(process.cwd(), initialDir);
+  const projectName = path.basename(projectDir);
+
+  const nameCheck = validatePackageName(projectName);
+  if (!nameCheck.validForNewPackages) {
+    const errs = [...(nameCheck.errors ?? []), ...(nameCheck.warnings ?? [])];
+    throw new Error(
+      `Invalid project directory name "${projectName}".\n` +
+        errs.map((e) => `- ${e}`).join("\n")
+    );
+  }
+
+  const answers = await inquirer.prompt([
+    {
+      type: "list",
+      name: "language",
+      message: "Choose language:",
+      choices: [
+        { name: "TypeScript", value: "ts" },
+        { name: "JavaScript (ESM)", value: "js" }
+      ],
+      when: !options.ts && !options.js,
+      default: "ts"
+    },
+    {
+      type: "list",
+      name: "database",
+      message: "Database:",
+      choices: [
+        { name: "MongoDB", value: "mongodb" },
+        { name: "PostgreSQL", value: "postgres" }
+      ],
+      when: !options.db,
+      default: "mongodb"
+    }
+  ]);
+
+  const language: Language = options.ts ? "ts" : options.js ? "js" : answers.language;
+  const database: Database =
+    options.db === "mongodb" || options.db === "postgres" ? (options.db as Database) : answers.database;
+
+  const spinner = ora("Creating project...").start();
+  try {
+    await fs.ensureDir(projectDir);
+    await ensureEmptyDirOrThrow(projectDir, { force: Boolean(options.force) });
+
+    const backendTemplate = language === "ts" ? "backend-ts" : "backend-js";
+    const frontendTemplate = language === "ts" ? "frontend-ts" : "frontend-js";
+
+    await copyTemplateDir({
+      templatesDir,
+      templateName: backendTemplate,
+      destDir: path.join(projectDir, "backend")
+    });
+    await copyTemplateDir({
+      templatesDir,
+      templateName: frontendTemplate,
+      destDir: path.join(projectDir, "frontend")
+    });
+
+    await writeRootPackageJson({ projectDir, projectName });
+    await writeBackendEnv({ projectDir, database });
+
+    spinner.succeed("Project created");
+
+    if (options.install !== false) {
+      await installDependencies(projectDir, ["backend", "frontend"]);
+    }
+
+    console.log(chalk.green("\n✅ Setup complete!\n"));
+    console.log(`cd ${path.relative(process.cwd(), projectDir) || "."}`);
+    console.log("npm run dev");
+  } catch (err) {
+    spinner.fail("Failed to create project");
+    throw err;
+  }
+}
+
+export function createCommand() {
+  return new Command("create")
+    .description("Create a new fullstack project")
+    .argument("[dir]", "project directory name (defaults to current dir)")
+    .option("--ts", "use TypeScript templates")
+    .option("--js", "use JavaScript templates")
+    .option("--db <db>", "database: mongodb | postgres")
+    .option("--install", "install dependencies", true)
+    .option("--no-install", "skip installing dependencies")
+    .option("--force", "overwrite target directory if not empty", false)
+    .action(createAction);
+}
+

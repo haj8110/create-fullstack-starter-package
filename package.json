@@ -1,0 +1,59 @@
+{
+  "name": "@haj8110/create-fullstack-starter",
+  "version": "1.0.2",
+  "type": "module",
+  "description": "Production-grade CLI to scaffold a fullstack starter (Node.js + React).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/create-fullstack-starter.git"
+  },
+  "homepage": "https://github.com/your-org/create-fullstack-starter#readme",
+  "bugs": {
+    "url": "https://github.com/your-org/create-fullstack-starter/issues"
+  },
+  "keywords": [
+    "create",
+    "scaffold",
+    "starter",
+    "fullstack",
+    "cli",
+    "react",
+    "vite",
+    "express",
+    "typescript"
+  ],
+  "bin": {
+    "create-fullstack-starter": "./bin/index.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "templates/"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "node ./bin/index.js",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^14.0.1",
+    "execa": "^9.6.0",
+    "fs-extra": "^11.3.1",
+    "inquirer": "^12.9.4",
+    "ora": "^8.2.0",
+    "validate-npm-package-name": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.12.2",
+    "eslint": "^9.39.4",
+    "tsup": "^8.5.0",
+    "typescript": "~6.0.2"
+  }
+}
