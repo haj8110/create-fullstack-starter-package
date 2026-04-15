@@ -5,20 +5,20 @@ Create a production-ready fullstack app (Node.js + React) in seconds.
 ## ⚡ Usage
 
 ```bash
-npx create-fullstack-starter my-app
+npx @haj8110/create-fullstack-starter my-app
 ```
 
 ## 🧰 Options
 
 ```bash
 # non-interactive
-npx create-fullstack-starter my-app --ts --db mongodb
+npx @haj8110/create-fullstack-starter my-app --ts --db mongodb
 
 # overwrite if directory exists and is not empty
-npx create-fullstack-starter my-app --force
+npx @haj8110/create-fullstack-starter my-app --force
 
 # skip installing deps
-npx create-fullstack-starter my-app --no-install
+npx @haj8110/create-fullstack-starter my-app --no-install
 ```
 
 ## 🎯 Features

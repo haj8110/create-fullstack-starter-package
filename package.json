@@ -1,16 +1,16 @@
 {
   "name": "@haj8110/create-fullstack-starter",
-  "version": "1.0.2",
+  "version": "1.0.7",
   "type": "module",
   "description": "Production-grade CLI to scaffold a fullstack starter (Node.js + React).",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/create-fullstack-starter.git"
+    "url": "git+https://github.com/haj8110/create-fullstack-starter-package.git"
   },
-  "homepage": "https://github.com/your-org/create-fullstack-starter#readme",
+  "homepage": "https://github.com/haj8110/create-fullstack-starter-package#readme",
   "bugs": {
-    "url": "https://github.com/your-org/create-fullstack-starter/issues"
+    "url": "https://github.com/haj8110/create-fullstack-starter-package/issues"
   },
   "keywords": [
     "create",
@@ -24,7 +24,7 @@
     "typescript"
   ],
   "bin": {
-    "create-fullstack-starter": "./bin/index.js"
+    "create-fullstack-starter": "bin/index.js"
   },
   "files": [
     "bin/",
@@ -38,7 +38,11 @@
     "build": "tsup",
     "dev": "node ./bin/index.js",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "chalk": "^5.4.1",

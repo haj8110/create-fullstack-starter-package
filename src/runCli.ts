@@ -21,6 +21,7 @@ export async function runCli(argv: string[]) {
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)
+    .option("--debug", "print debug information", false)
     .action(createAction);
 
   // Also provide explicit subcommand for discoverability.

@@ -16,7 +16,14 @@ export async function copyTemplateDir(args: {
   await fs.copy(templatePath, args.destDir, {
     overwrite: true,
     errorOnExist: false,
-    filter: (src) => !src.endsWith(`${path.sep}node_modules`) && !src.includes(`${path.sep}node_modules${path.sep}`)
+    // Important: templates are often *located under* a `node_modules/` path when executed via `npx`.
+    // We only want to ignore `node_modules` that are *inside the template itself*.
+    filter: (src) => {
+      const rel = path.relative(templatePath, src);
+      if (!rel) return true;
+      const parts = rel.split(path.sep);
+      return !parts.includes("node_modules");
+    }
   });
 }
 

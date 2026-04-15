@@ -29,10 +29,14 @@ export type CreateOptions = {
   db?: string;
   install?: boolean;
   force?: boolean;
+  debug?: boolean;
 };
 
 export async function createAction(dirArg: string | undefined, options: CreateOptions) {
   const templatesDir = resolveTemplatesDir();
+  if (options.debug) {
+    console.log(`[debug] templatesDir=${templatesDir}`);
+  }
 
   const initialDir = dirArg ?? ".";
   const projectDir = resolveProjectDir(process.cwd(), initialDir);
@@ -89,6 +93,31 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
       templateName: backendTemplate,
       destDir: path.join(projectDir, "backend")
     });
+    const backendDir = path.join(projectDir, "backend");
+    const backendPkg = path.join(backendDir, "package.json");
+    if (!(await fs.pathExists(backendPkg))) {
+      const templatePath = path.join(templatesDir, backendTemplate);
+      const debugLines = [
+        `Backend template copy did not produce ${backendPkg}.`,
+        ``,
+        `Diagnostics:`,
+        `- templatesDir: ${templatesDir}`,
+        `- backendTemplate: ${backendTemplate}`,
+        `- templatePath exists: ${await fs.pathExists(templatePath)}`,
+        `- backendDir exists: ${await fs.pathExists(backendDir)}`
+      ];
+      try {
+        const entries = await fs.readdir(backendDir);
+        debugLines.push(`- backendDir entries: ${entries.length ? entries.join(", ") : "(empty)"}`);
+      } catch (e: any) {
+        debugLines.push(`- backendDir entries: (unreadable: ${e?.code ?? e})`);
+      }
+      debugLines.push(
+        ``,
+        `This usually indicates the published package is missing templates/ or the template structure is invalid.`
+      );
+      throw new Error(debugLines.join("\n"));
+    }
     await copyTemplateDir({
       templatesDir,
       templateName: frontendTemplate,
@@ -123,6 +152,7 @@ export function createCommand() {
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)
+    .option("--debug", "print debug information", false)
     .action(createAction);
 }
 
