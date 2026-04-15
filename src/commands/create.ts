@@ -10,6 +10,8 @@ import { fileURLToPath } from "node:url";
 import { copyTemplateDir } from "../fs/copyTemplateDir.js";
 import { ensureEmptyDirOrThrow, resolveProjectDir } from "../fs/projectDir.js";
 import { installDependencies } from "../pm/installDependencies.js";
+import type { PackageManager } from "../pm/packageManager.js";
+import { detectPackageManager } from "../pm/packageManager.js";
 import { writeRootPackageJson } from "../project/writeRootPackageJson.js";
 import { writeBackendEnv } from "../project/writeBackendEnv.js";
 
@@ -29,6 +31,7 @@ export type CreateOptions = {
   db?: string;
   auth?: boolean;
   noAuth?: boolean;
+  pm?: string;
   install?: boolean;
   force?: boolean;
   debug?: boolean;
@@ -102,6 +105,10 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
     options.db === "mongodb" || options.db === "postgres" ? (options.db as Database) : answers.database;
 
   const includeAuth: boolean = options.auth ? true : options.noAuth ? false : Boolean(answers.includeAuth);
+  const pm: PackageManager =
+    options.pm === "pnpm" || options.pm === "yarn" || options.pm === "npm"
+      ? (options.pm as PackageManager)
+      : detectPackageManager();
 
   const spinner = ora("Creating project...").start();
   try {
@@ -166,12 +173,17 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
         templateName: path.posix.join("auth", backendTemplate),
         destDir: path.join(projectDir, "backend")
       });
+      await copyTemplateDir({
+        templatesDir,
+        templateName: path.posix.join("auth", frontendTemplate),
+        destDir: path.join(projectDir, "frontend")
+      });
     }
 
     spinner.succeed("Project created");
 
     if (options.install !== false) {
-      await installDependencies(projectDir, ["backend", "frontend"]);
+      await installDependencies({ projectDir, workspaces: ["backend", "frontend"], pm });
     }
 
     console.log(chalk.green("\n✅ Setup complete!\n"));
@@ -192,6 +204,7 @@ export function createCommand() {
     .option("--db <db>", "database: mongodb | postgres")
     .option("--auth", "include authentication module (JWT)", false)
     .option("--no-auth", "exclude authentication module")
+    .option("--pm <pm>", "package manager: pnpm | yarn | npm")
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)

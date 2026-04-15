@@ -63,6 +63,7 @@ npx create-fullstack-starter my-app
 --ts             Use TypeScript
 --db <name>      Choose database (mongodb)
 --auth           Include authentication module (JWT)
+--pm <pm>        Package manager (pnpm | yarn | npm)
 --no-install     Skip dependency install
 --force          Overwrite existing folder
 ```

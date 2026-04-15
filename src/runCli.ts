@@ -20,6 +20,7 @@ export async function runCli(argv: string[]) {
     .option("--db <db>", "database: mongodb | postgres")
     .option("--auth", "include authentication module (JWT)", false)
     .option("--no-auth", "exclude authentication module")
+    .option("--pm <pm>", "package manager: pnpm | yarn | npm")
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)
