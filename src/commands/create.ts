@@ -27,10 +27,21 @@ export type CreateOptions = {
   ts?: boolean;
   js?: boolean;
   db?: string;
+  auth?: boolean;
   install?: boolean;
   force?: boolean;
   debug?: boolean;
 };
+
+async function resolveTemplateName(args: {
+  templatesDir: string;
+  preferred: string;
+  fallback: string;
+}) {
+  const preferredPath = path.join(args.templatesDir, args.preferred);
+  if (await fs.pathExists(preferredPath)) return args.preferred;
+  return args.fallback;
+}
 
 export async function createAction(dirArg: string | undefined, options: CreateOptions) {
   const templatesDir = resolveTemplatesDir();
@@ -88,9 +99,15 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
     const backendTemplate = language === "ts" ? "backend-ts" : "backend-js";
     const frontendTemplate = language === "ts" ? "frontend-ts" : "frontend-js";
 
+    const resolvedBackendTemplate = await resolveTemplateName({
+      templatesDir,
+      preferred: path.posix.join("base", backendTemplate),
+      fallback: backendTemplate
+    });
+
     await copyTemplateDir({
       templatesDir,
-      templateName: backendTemplate,
+      templateName: resolvedBackendTemplate,
       destDir: path.join(projectDir, "backend")
     });
     const backendDir = path.join(projectDir, "backend");
@@ -120,12 +137,24 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
     }
     await copyTemplateDir({
       templatesDir,
-      templateName: frontendTemplate,
+      templateName: await resolveTemplateName({
+        templatesDir,
+        preferred: path.posix.join("base", frontendTemplate),
+        fallback: frontendTemplate
+      }),
       destDir: path.join(projectDir, "frontend")
     });
 
     await writeRootPackageJson({ projectDir, projectName });
-    await writeBackendEnv({ projectDir, database });
+    await writeBackendEnv({ projectDir, database, auth: Boolean(options.auth) });
+
+    if (options.auth) {
+      await copyTemplateDir({
+        templatesDir,
+        templateName: path.posix.join("auth", backendTemplate),
+        destDir: path.join(projectDir, "backend")
+      });
+    }
 
     spinner.succeed("Project created");
 
@@ -149,6 +178,7 @@ export function createCommand() {
     .option("--ts", "use TypeScript templates")
     .option("--js", "use JavaScript templates")
     .option("--db <db>", "database: mongodb | postgres")
+    .option("--auth", "include authentication module (JWT)", false)
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)
