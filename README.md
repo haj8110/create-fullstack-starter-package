@@ -30,6 +30,7 @@ This CLI focuses on:
 - ✅ React frontend
 - ✅ TypeScript or JavaScript support
 - ✅ MongoDB (more DBs coming soon)
+- ✅ Optional auth module (`--auth`) with JWT + bcrypt
 - ✅ Clean folder structure (controller/service based)
 - ✅ Pre-configured scripts
 - ✅ Zero config setup
@@ -61,6 +62,7 @@ npx create-fullstack-starter my-app
 ```bash
 --ts             Use TypeScript
 --db <name>      Choose database (mongodb)
+--auth           Include authentication module (JWT)
 --no-install     Skip dependency install
 --force          Overwrite existing folder
 ```
@@ -70,6 +72,30 @@ npx create-fullstack-starter my-app
 ```bash
 npx create-fullstack-starter my-app --ts --db mongodb
 ```
+
+---
+
+## 🔐 Authentication (optional)
+
+Enable auth scaffolding with:
+
+```bash
+npx create-fullstack-starter my-app --auth
+```
+
+### Endpoints
+
+- `POST /api/auth/register` `{ email, password }` → `{ token, user }`
+- `POST /api/auth/login` `{ email, password }` → `{ token, user }`
+- `GET /api/protected` (requires `Authorization: Bearer <token>`)
+
+### Env vars
+
+When `--auth` is enabled, backend `.env.example` includes:
+
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN` (default `1h`)
+- `BCRYPT_SALT_ROUNDS` (default `10`)
 
 ---
 
