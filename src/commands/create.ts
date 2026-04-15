@@ -28,6 +28,7 @@ export type CreateOptions = {
   js?: boolean;
   db?: string;
   auth?: boolean;
+  noAuth?: boolean;
   install?: boolean;
   force?: boolean;
   debug?: boolean;
@@ -48,6 +49,8 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
   if (options.debug) {
     console.log(`[debug] templatesDir=${templatesDir}`);
   }
+
+  const authSpecified = process.argv.includes("--auth") || process.argv.includes("--no-auth");
 
   const initialDir = dirArg ?? ".";
   const projectDir = resolveProjectDir(process.cwd(), initialDir);
@@ -84,12 +87,21 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
       ],
       when: !options.db,
       default: "mongodb"
+    },
+    {
+      type: "confirm",
+      name: "includeAuth",
+      message: "Include auth? (JWT)",
+      when: !authSpecified,
+      default: false
     }
   ]);
 
   const language: Language = options.ts ? "ts" : options.js ? "js" : answers.language;
   const database: Database =
     options.db === "mongodb" || options.db === "postgres" ? (options.db as Database) : answers.database;
+
+  const includeAuth: boolean = options.auth ? true : options.noAuth ? false : Boolean(answers.includeAuth);
 
   const spinner = ora("Creating project...").start();
   try {
@@ -146,9 +158,9 @@ export async function createAction(dirArg: string | undefined, options: CreateOp
     });
 
     await writeRootPackageJson({ projectDir, projectName });
-    await writeBackendEnv({ projectDir, database, auth: Boolean(options.auth) });
+    await writeBackendEnv({ projectDir, database, auth: includeAuth });
 
-    if (options.auth) {
+    if (includeAuth) {
       await copyTemplateDir({
         templatesDir,
         templateName: path.posix.join("auth", backendTemplate),
@@ -179,6 +191,7 @@ export function createCommand() {
     .option("--js", "use JavaScript templates")
     .option("--db <db>", "database: mongodb | postgres")
     .option("--auth", "include authentication module (JWT)", false)
+    .option("--no-auth", "exclude authentication module")
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)

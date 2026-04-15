@@ -19,6 +19,7 @@ export async function runCli(argv: string[]) {
     .option("--js", "use JavaScript templates")
     .option("--db <db>", "database: mongodb | postgres")
     .option("--auth", "include authentication module (JWT)", false)
+    .option("--no-auth", "exclude authentication module")
     .option("--install", "install dependencies", true)
     .option("--no-install", "skip installing dependencies")
     .option("--force", "overwrite target directory if not empty", false)
