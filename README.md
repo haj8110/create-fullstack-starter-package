@@ -1,80 +1,145 @@
-# 🚀 Fullstack Starter CLI
+# 🚀 create-fullstack-starter
 
-Create a production-ready fullstack app (Node.js + React) in seconds.
+> Create a production-ready fullstack app in seconds ⚡
 
-## ⚡ Usage
+A powerful CLI to scaffold scalable fullstack applications with Node.js, React, and modern best practices.
+
+---
+
+## ⚡ Demo
+
+![Demo](./demo.gif)
+
+---
+
+## 🔥 Why this?
+
+Most starters give you a basic setup.
+
+This CLI focuses on:
+- 🧱 Clean, scalable backend architecture
+- ⚙️ Ready-to-use fullstack setup
+- 🚀 Fast project bootstrap (under 30 seconds)
+- 🛠 Developer-friendly CLI
+
+---
+
+## ✨ Features
+
+- ✅ Node.js + Express backend
+- ✅ React frontend
+- ✅ TypeScript or JavaScript support
+- ✅ MongoDB (more DBs coming soon)
+- ✅ Clean folder structure (controller/service based)
+- ✅ Pre-configured scripts
+- ✅ Zero config setup
+
+---
+
+## 📦 Installation
 
 ```bash
-npx @haj8110/create-fullstack-starter my-app
+npm install -g create-fullstack-starter
 ```
 
-## 🧰 Options
+or use directly:
 
 ```bash
-# non-interactive
-npx @haj8110/create-fullstack-starter my-app --ts --db mongodb
-
-# overwrite if directory exists and is not empty
-npx @haj8110/create-fullstack-starter my-app --force
-
-# skip installing deps
-npx @haj8110/create-fullstack-starter my-app --no-install
+npx create-fullstack-starter my-app
 ```
 
-## 🎯 Features
+---
 
-* Node.js backend (Express)
-* React frontend (Vite)
-* JavaScript & TypeScript support
-* MongoDB / PostgreSQL ready
-* Clean scalable structure
-* Beginner-friendly setup
-
-## 📦 What You Get
+## 🚀 Usage
 
 ```bash
+npx create-fullstack-starter my-app
+```
+
+### Options
+
+```bash
+--ts             Use TypeScript
+--db <name>      Choose database (mongodb)
+--no-install     Skip dependency install
+--force          Overwrite existing folder
+```
+
+### Example
+
+```bash
+npx create-fullstack-starter my-app --ts --db mongodb
+```
+
+---
+
+## 📁 Project Structure
+
+```text
 my-app/
-  backend/
-  frontend/
+├── backend/
+│   ├── controllers/
+│   ├── services/
+│   ├── routes/
+│   ├── config/
+│   └── server.ts
+│
+├── frontend/
+│   ├── src/
+│   └── public/
+│
+└── package.json
 ```
 
-## 🚀 Quick Start
+---
 
-```bash
-cd my-app
-npm install
-npm run dev
-```
+## 🧠 Architecture
 
-## 🧪 Local development (this repo)
+Backend follows a scalable pattern:
 
-```bash
-npm install
-npm run build
-node ./bin/index.js test-app --ts --db mongodb --no-install
-```
+* Controllers → Handle request/response
+* Services → Business logic
+* Routes → API structure
+* Config → Environment & DB setup
 
-## 🧠 Why this project?
+---
 
-This starter saves developers hours of setup and provides a clean foundation for real-world apps.
+## 🛣 Roadmap
+
+* [ ] 🔐 Authentication (JWT)
+* [ ] 🐳 Docker support
+* [ ] 🧪 Testing setup (Jest)
+* [ ] 🗄 PostgreSQL & Prisma
+* [ ] ⚡ Interactive CLI prompts
+* [ ] ☁️ Deployment configs (AWS / Vercel)
+
+---
 
 ## 🤝 Contributing
 
-We welcome contributions!
+Contributions are welcome!
 
-* Fork the repo
-* Create a branch
-* Submit a PR
+```bash
+git clone https://github.com/haj8110/create-fullstack-starter-package
+cd create-fullstack-starter-package
+npm install
+```
 
-See `CONTRIBUTING.md`.
-
-## 🧩 Roadmap
-
-* [ ] Add authentication module
-* [ ] Add Docker support
-* [ ] Add admin dashboard
-* [ ] Add testing setup
+---
 
 ## ⭐ Support
 
-If you like this project, give it a star ⭐
+If you like this project, give it a ⭐ on GitHub!
+
+---
+
+## 👨‍💻 Author
+
+Haj Mohamed  
+Backend Developer | Node.js | AWS
+
+---
+
+## 📄 License
+
+MIT
